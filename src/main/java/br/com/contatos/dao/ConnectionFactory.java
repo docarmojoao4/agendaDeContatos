@@ -10,7 +10,7 @@ public class ConnectionFactory {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             String url = "jdbc:mysql://localhost:3306/agenda_contatos";
-            return DriverManager.getConnection(url, "root", "1904");
+            return DriverManager.getConnection(url, "root", "****");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Driver do MySQL não encontrado!", e);
         } catch (SQLException e) {
