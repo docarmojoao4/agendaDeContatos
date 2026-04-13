@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Cadastro de Clientes</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <h1>Agenda de Cadastro de Clientes</h1>
+    </header>
+
+    <main class="container">
+        <section class="search-section">
+            <form class="search-form" onsubmit="event.preventDefault(); carregarClientes();">
+                <input type="text" name="busca" id="campo-busca" placeholder="Buscar por nome ou CPF...">
+                <button type="submit" class="btn-search">Pesquisar</button>
+            </form>
+            <button class="btn-add" onclick="toggleForm()">+ Novo Cliente</button>
+        </section>
+
+        <section id="form-section" class="form-container hidden">
+            <h2 id="form-title">Cadastrar Novo Cliente</h2>
+            <form action="clientes" method="POST">
+                <input type="hidden" name="id" id="cliente-id-hidden">
+                <input type="hidden" name="idEndereco" id="endereco-id-hidden">
+
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" name="nome" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" name="cpf" id="cpf" maxlength="14" oninput="mascaraCPF(this)" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Nascimento</label>
+                        <input type="date" name="dataNascimento" required>
+                    </div>
+                </div>
+
+                <fieldset>
+                    <legend>Endereço</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CEP</label>
+                            <input type="text" name="cep" id="cep" maxlength="9" oninput="mascaraCEP(this)"
+                                onblur="buscarCep()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Logradouro</label>
+                            <input type="text" name="logradouro" id="logradouro" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Número</label>
+                            <input type="number" name="numero" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bairro</label>
+                            <input type="text" name="bairro" id="bairro" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cidade</label>
+                            <input type="text" name="localidade" id="localidade" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <input type="text" name="estado" id="estado" required>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="toggleForm()">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar Cliente</button>
+                    <button type="button" id="btn-excluir-editar" class="btn-delete" style="background-color: #e74c3c; color: white; display: none;">Excluir Cliente</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Cidade/UF</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-clientes-corpo"></tbody>
+            </table>
+        </section>
+
+        <section id="detalhes-cliente" class="form-container hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Ficha do Cliente</h2>
+                <button class="btn-cancel" onclick="fecharDetalhes()">Voltar para a Lista</button>
+                <div class="form-actions" style="margin-top: 20px;">
+                   
+
+                    <button type="button" class="btn-delete" id="btn-excluir-ficha"
+                        style="background-color: #e74c3c; color: white;">Excluir Cliente</button>
+                </div>
+            </div>
+
+            <div class="detalhes-grid">
+                <div class="info-box">
+                    <strong>Nome:</strong> <span id="view-nome"></span>
+                </div>
+                <div class="info-box">
+                    <strong>CPF:</strong> <span id="view-cpf"></span>
+                </div>
+                <div class="info-box">
+                    <strong>Data de Nascimento:</strong> <span id="view-nascimento"></span>
+                </div>
+            </div>
+
+            <fieldset style="margin-top: 20px;">
+                <legend>Localização</legend>
+                <p><strong>Logradouro:</strong> <span id="view-logradouro"></span>, nº <span id="view-numero"></span>
+                </p>
+                <p><strong>Bairro:</strong> <span id="view-bairro"></span></p>
+                <p><strong>Cidade/UF:</strong> <span id="view-localidade"></span> / <span id="view-estado"></span></p>
+                <p><strong>CEP:</strong> <span id="view-cep"></span></p>
+            </fieldset>
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="button" class="btn-edit" id="btn-editar-ficha">Editar Cadastro</button>
+                <button type="button" class="btn-contacts" id="btn-contatos-ficha">Gerenciar Contatos</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal-contatos" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal('modal-contatos')">&times;</span>
+            <h2>Contatos de <span id="nome-cliente-contato"></span></h2>
+
+            <form id="form-novo-contato" onsubmit="event.preventDefault(); salvarNovoContato();">
+                <input type="hidden" name="clienteId" id="contato-cliente-id">
+                <div class="form-row">
+                    <select name="tipo" id="tipo-contato-modal" required>
+                        <option value="TELEFONE">Telefone</option>
+                        <option value="EMAIL">E-mail</option>
+                    </select>
+                    <input type="text" name="valor" id="valor-contato-modal" placeholder="Contato..." required>
+                    <button type="submit" class="btn-save">Adicionar</button>
+                </div>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Contato</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-tabela-contatos"></tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
