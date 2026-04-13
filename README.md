@@ -91,4 +91,4 @@ O desenvolvimento deste desafio contou com o auxílio de IA (Gemini) para:
 * **Estruturação da documentação técnica**: Organização e formatação deste arquivo README.
 * **Refinamento e revisão de código**: Otimização de lógica e revisão das melhores práticas de desenvolvimento.
 * **Impacto**: Aumento da produtividade na escrita de documentação e garantia de um código mais limpo e estruturado.
-```
+
